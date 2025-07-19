@@ -42,9 +42,12 @@ external_link:
 filename_case: 0
 render_drafts: false
 post_asset_folder: true
-marked:
-  prependRoot: true
-  postAsset: true
+markdown:
+  plugins:
+    - "@traptitech/markdown-it-katex"
+  images:
+    prepend_root: true
+    post_asset: true
 relative_link: false
 future: true
 syntax_highlighter: highlight.js
@@ -107,6 +110,3 @@ theme: fluid
 deploy:
   type: ""
 
-markdown:
-  plugins:
-    - "@traptitech/markdown-it-katex"
