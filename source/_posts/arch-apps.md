@@ -21,9 +21,10 @@ banner_img:
 除此之外，还可以了解一下各种[窗口管理器](https://wiki.archlinux.org/title/Window_manager)。
 
 平铺式窗口管理器：
- - 窗口之间不会重叠，会自动分割并填充屏幕；
- - 没有任务栏，全部使用虚拟桌面来管理/布局不同的窗口;
- - 支持全键盘操作。
+
+- 窗口之间不会重叠，会自动分割并填充屏幕；
+- 没有任务栏，全部使用虚拟桌面来管理/布局不同的窗口;
+- 支持全键盘操作。
 
 对于平铺式窗口管理器，推荐 [Hyprland](https://hypr.land/)。
 
@@ -43,7 +44,6 @@ Hyprland 并非开箱即用，需要大量的配置，因此可以先使用大�
 丰富的主题，内置就有七八种主题，可以一键灵活切换。
 
 使用 Waybar 因此组件的外观有些简陋。
-
 
 #### [end4's dotfiles](https://github.com/end-4/dots-hyprland)
 
@@ -87,7 +87,6 @@ env = SDL_IM_MODULE, fcitx
 env = GLFW_IM_MODULE, ibus
 env = INPUT_METHOD, fcitx
 ```
-
 
 ### 启动fcitx5，安装rime输入法
 
@@ -169,17 +168,250 @@ yay -S fcitx5-skin-fluentlight-git
 
 之后进入fcitx5-configtool，在 `Addons`-`UI`-`Classic User Interface` 中，在 `Theme` 和 `Dark Theme` 中下拉选中自己想要的主题即可。
 
+## GRUB
+
+### GRUB 主题
+
+这个仓库集成了许多好看的 GRUB 主题：<https://github.com/Jacksaur/Gorgeous-GRUB>
+
+## SDDM
+
+### SDDM 主题
+
+SDDM 主题可按自己的喜好下载。这里推荐 [sddm-astronaut-theme](https://github.com/Keyitdev/sddm-astronaut-theme)，里面集成许多主题，可以自行选择。
+
+主题目录基本都是 `/usr/share/sddm/themes/<theme-name>`。
+
+设置方法见对应主题的说明。
+
+### 设置 SDDM 触摸板轻触为点击
+
+SDDM 默认运行在 Xorg 上，因此要修改 X11 的设置：
+
+添加文件 `/etc/X11/xorg.conf.d/20-touchpad.conf` 并填入下面的内容：
+
+```conf
+Section "InputClass"
+        Identifier "libinput touchpad catchall"
+        MatchIsTouchpad "on"
+        MatchDevicePath "/dev/input/event*"
+        Driver "libinput"
+
+        Option "Tapping" "on"
+        Option "NaturalScrolling" "on"
+        Option "MiddleEmulation" "on"
+        Option "DisableWhileTyping" "on"
+EndSection
+```
+
+## 动态壁纸
+
+这里使用 [mpvpaper](https://github.com/GhostNaN/mpvpaper)，可以将视频作为桌面，并支持mpv的设置。
+
+### 安装
+
+```bash
+sudo pacman -S mpvpaper
+```
+
+### 设置自动启动
+
+在`~/.config/hypr/userprefs.conf`中添加：
+
+```conf
+exec-once = mpvpaper -f -n 7200 -o "input-ipc-server=/tmp/mpv-socket --shuffle --loop --loop-playlist --panscan=1.0 --osd-level=0" "*" /home/Videos/Wallpapers
+```
+
+参数解释:
+
+mpvpaper详细参数意义见`man mpvpaper`，mpv详细设置见<https://mpv.io/manual/master>
+
+- `-f` -- fork mpvpaper从而可以关闭终端
+- `-n 7200` -- 幻灯片模式每2小时（7200秒）播放播放列表中的下一个视频，需配合`--loop`, `--loop-playlist`使用
+- `-o` -- mpvpaper传递参数给mpv
+  - `input-ipc-server=/tmp/mpv-socket` -- 提供mpvpaper的控制接口
+  - `shuffle` -- 启动时打乱播放列表
+  - `loop` -- 循环播放视频
+  - `loop-playlist` -- 循环播放列表
+  - `panscan=1.0` -- 拉伸以填充整个屏幕（不留黑边）
+  - `osd-level=0` -- 去除所有mpv渲染在视频上的OSD信息，避免禁音mpv时显示"Mute: yes"
+- `"*"` -- 显示在所有屏幕上
+- `/home/Video/Wallpapers` -- # 播放的可以是视频文件或者包含视频文件的文件夹
+
+参数过多，可以设置mpv配置文件，再引用配置文件`~/.config/mpv/mpv.conf`，详细见<https://mpv.io/manual/master/#configuration-files>：
+
+```conf
+[mpvpaper]
+profile-desc="profile for mpvpaper"
+vo=gpu-next
+gpu-api=auto
+hwdec=auto-safe
+profile=fast
+input-ipc-server=/tmp/mpv-socket
+shuffle
+loop
+loop-playlist
+panscan=1.0
+osd-level=0
+```
+
+之后自动启动便可写为：
+
+```conf
+exec-once = mpvpaper -f -n 7200 -o "profile=mpvpaper" "*" /home/Videos/Wallpapers
+```
+
+### 设置mpvpaper桌面图层排序
+
+此外，为避免视频桌面被其他桌面程序覆盖(HyDE中是swww-daemon)，可以设置mpvpaper的layer优先度最低，或者直接不启动其他桌面程序：
+
+```conf
+layerrule = order -1, mpvpaper
+```
+
+### 自动暂停、禁音
+
+mpvpaper提供`--auto-pause`和`--auto-stop`的参数，但在hyprland中没有效果，因此自己写了两个脚本：
+
+- [auto_pause_mute_mpvpaper.sh](https://gist.github.com/coinhere/b97695322f9079a2178bb55120f2a795)，作用是：
+  - 工作区窗口数量由0变为1时静音，由1变为0时取消静音
+  - 窗口全屏时（非最大化）暂停，退出全屏时取消暂停
+  - 切换工作区后，根据工作区窗口数量和是否全屏选择禁音、暂停mpvpaper与否
+- [mpvpaper.sh](https://gist.github.com/coinhere/b97695322f9079a2178bb55120f2a795#file-mpvpaper-sh)，作用是：
+  - 如果以及有mpvpaper.sh进程则直接退出
+  - 启动mpvpaper和auto_pause_mute_mpvpaper.sh
+  - 退出时关闭mpvpaper和auto_pause_mute_mpvpaper.sh
+  - 每隔一秒检测系统是否有其他音频输出，有则将mpvpaper音量降至零
+
+需要开启mpvpaper控制接口，并安装`socat`
+
+自动启动修改为：
+
+```conf
+exec-once = $HOME/.config/hypr/scripts/mpvpaper.sh
+```
+
+### 添加控制壁纸快捷键
+
+在`~/.config/hypr/keybindings.conf`：
+
+需要开启mpvpaper控制接口，并安装`socat`
+
+```conf
+# mpv-paper
+# 切换mpvpaper运行状态，关闭/启动mpvpaper及相关进程
+bindd = $mainMod, F4, $d toggle mpvpaper, exec, pkill -x mpvpaper.sh >/dev/null || ~/.config/hypr/scripts/mpvpaper.sh
+bindd = $mainMod, F5, $d toggle mpvpaper voice, exec, echo 'cycle mute' | socat - /tmp/mpv-socket # 静音/取消静音
+bindd = $mainMod, F6, $d mpvpaper play prev, exec, echo 'playlist-prev' | socat - /tmp/mpv-socket # 播放上一个
+bindd = $mainMod, F7, $d toggle mpvpaper play, exec, echo 'cycle pause' | socat - /tmp/mpv-socket # 暂停/取消暂停
+bindd = $mainMod, F8, $d mpvpaper play next, exec, echo 'playlist-next' | socat - /tmp/mpv-socket # 播放下一个
+```
+
+### 自动退出、启动动态壁纸
+
+hyprlock锁屏时，动态壁纸还会运行，因此写了个脚本锁屏时退出mpvpaper，解锁时再打开mpvpaper，这里使用上面脚本启动mpvpaper：
+
+```bash
+#!/bin/bash
+
+lock() {
+  # avoid starting multiple hyprlock instances.
+  if ! pidof hyprlock >/dev/null; then
+    # quit mpvpaper script
+    pkill -x mpvpaper.sh
+    # pause music
+    # playerctl pause
+    # when unlock, restart mpvpaper
+    lockscreen.sh && lock_hook
+  fi
+}
+
+lock_hook() {
+  # run mpvpaper again
+  # playerctl play
+  ~/.config/hypr/scripts/mpvpaper.sh
+}
+
+lock
+```
+
+## 改键
+
+需求：
+
+- `CapsLock`单击为`Escape`
+- `CapsLock` + `f,b,p,n,a,e,u,d` = `right`, `left`, `up`, `down`, `home`, `end`, `pageup`, `pagedown`
+- `CapsLock` + `h,j,k,l` = `left`, `down`, `up`, `right`
+- `Escape`为`CapsLock`
+- 右`Ctrl`键与右`Alt`键互换
+
+这里选用[keyd](https://github.com/rvaiya/keyd)来改键，如果只是单纯交换键位可以使用Hyprland自带的[改键配置]()，
+
+安装并启用keyd：
+
+```bash
+sudo pacman -S keyd
+sudo systemctl enable --now keyd
+```
+
+要查看各个键位的名称，运行并按下要查看的键位：
+
+```bash
+sudo keyd monitor
+```
+
+添加配置文件`/etc/keyd/default.conf`，如下所示：
+
+```conf
+[ids]
+
+*
+
+[main]
+
+# Maps capslock to escape when pressed and control when held.
+capslock = overload(capslock_layer, esc)
+
+# Remaps the escape key to capslock
+esc = capslock
+rightalt = rightcontrol
+rightshift = rightshift
+
+[capslock_layer]
+f = right
+b = left
+p = up
+n = down
+a = home
+e = end
+u = pageup
+d = pagedown
+h = left
+j = down
+k = up
+l = right
+space = backspace
+backspace = delete
+```
+
+运行以下命令来重载配置：
+
+```bash
+sudo keyd reload
+```
+
 ## 其他推荐的应用
 
 - 科学上网。请查阅[简明指南-透明代理](https://arch.icekylin.online/guide/rookie/transparent.html)
-- [keyd](https://github.com/rvaiya/keyd)，改键软件
 - [fish shell](https://fishshell.com/)——用户友好的 Shell，自带许多有用功能，比需要加载一堆插件的 zsh 启动要快的多。不如的是，fish shell 不兼容 POSIX
+- yazi
 - [neovim](https://neovim.io/)——完全兼容 vim，同时插件生态极其丰富。觉得配置麻烦的可以使用 [lazyvim](http://www.lazyvim.org/installation)，完全可以说是一个 IDE 了。
 - [neovide](https://neovide.dev/)——搭配 neovim，一个Neovim的图形用户界面。有更好的视觉及输入体验，动画丝滑无比。
 - [vscode](https://wiki.archlinux.org/title/Visual_Studio_Code)——无须多言。
 - [openRGB](https://openrgb.org/)——光污染必备
 - [btop](https://github.com/aristocratos/btop)——一个系统资源监视器，类似任务管理器
+- [pyprland](https://hyprland-community.github.io/pyprland/)——为 hyprland 用户提供了一下有用的插件，主要用到的是 `scratchpads`
 
 ## 个性化配置
 
-关于终端、Shell、编辑器和各种软件的设置文件，可以查看我的 [dotfiles](https://github.com/alyingfish/dotfiles)
+关于 hyprland、终端、Shell、编辑器和各种软件的具体配置文件，可以查看我的 [dotfiles](https://github.com/alyingfish/dotfiles)
