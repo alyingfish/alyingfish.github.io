@@ -174,6 +174,12 @@ yay -S fcitx5-skin-fluentlight-git
 
 这个仓库集成了许多好看的 GRUB 主题：<https://github.com/Jacksaur/Gorgeous-GRUB>
 
+这里推荐 [Elegant-grub2-themes](https://github.com/vinceliuice/Elegant-grub2-themes)
+
+### Elegant-grub2-themes
+
+从 `1f7907` 后，原有的 DejaVuSans 字体被替换成了 Grub 默认的 unifont 字体。为此你可能需要手动替换之前的字体，或使用在这之前的版本。
+
 ## SDDM
 
 ### SDDM 主题
