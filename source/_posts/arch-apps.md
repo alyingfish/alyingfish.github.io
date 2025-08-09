@@ -10,7 +10,6 @@ banner_img:
 ---
 
 > 本文为[安装 Arch Linux 到移动硬盘上](./arch-install/)的后续应用安装、配置说明。
-> 也就是：桌面环境/窗口管理器、输入法、Shell、终端、编辑器、浏览器。
 
 <!-- more -->
 
@@ -30,7 +29,7 @@ banner_img:
 
 ### Hyprland
 
-之所以选择 [Hyprland](https://hypr.land/)，最重要的就是其**华丽的动画和视觉效果**，然后就是**丰富强大可配置选项**以及**Wayland 原生支持**。
+之所以选择 [Hyprland](https://hypr.land/)，最重要的就是其**动画和视觉效果**，然后就是**丰富强大可配置选项**以及 **Wayland 原生支持**。
 
 Hyprland 并非开箱即用，需要大量的配置，因此可以先使用大佬们的 [dotfiles](https://wiki.hypr.land/Getting-Started/Preconfigured-setups/)。
 
@@ -214,6 +213,8 @@ EndSection
 
 这里使用 [mpvpaper](https://github.com/GhostNaN/mpvpaper)，可以将视频作为桌面，并支持mpv的设置。
 
+end-4 的 Hyprland 配置支持视频类型壁纸，并自动根据视频第一帧图像生成对应的主题颜色。因此可以跳过这一节。
+
 ### 安装
 
 ```bash
@@ -222,7 +223,7 @@ sudo pacman -S mpvpaper
 
 ### 设置自动启动
 
-在`~/.config/hypr/userprefs.conf`中添加：
+在 `~/.config/hypr/userprefs.conf` 中添加：
 
 ```conf
 exec-once = mpvpaper -f -n 7200 -o "input-ipc-server=/tmp/mpv-socket --shuffle --loop --loop-playlist --panscan=1.0 --osd-level=0" "*" /home/Videos/Wallpapers
@@ -230,21 +231,21 @@ exec-once = mpvpaper -f -n 7200 -o "input-ipc-server=/tmp/mpv-socket --shuffle -
 
 参数解释:
 
-mpvpaper详细参数意义见`man mpvpaper`，mpv详细设置见<https://mpv.io/manual/master>
+mpvpaper 详细参数意义见 `man mpvpaper` ，mpv 详细设置见 <https://mpv.io/manual/master>
 
-- `-f` -- fork mpvpaper从而可以关闭终端
-- `-n 7200` -- 幻灯片模式每2小时（7200秒）播放播放列表中的下一个视频，需配合`--loop`, `--loop-playlist`使用
-- `-o` -- mpvpaper传递参数给mpv
-  - `input-ipc-server=/tmp/mpv-socket` -- 提供mpvpaper的控制接口
+- `-f` -- fork mpvpaper 从而可以关闭终端
+- `-n 7200` -- 幻灯片模式每2小时（7200秒）播放播放列表中的下一个视频，需配合 `--loop`, `--loop-playlist` 使用
+- `-o` -- mpvpaper 传递参数给 mpv
+  - `input-ipc-server=/tmp/mpv-socket` -- 提供 mpvpaper 的控制接口
   - `shuffle` -- 启动时打乱播放列表
   - `loop` -- 循环播放视频
   - `loop-playlist` -- 循环播放列表
   - `panscan=1.0` -- 拉伸以填充整个屏幕（不留黑边）
-  - `osd-level=0` -- 去除所有mpv渲染在视频上的OSD信息，避免禁音mpv时显示"Mute: yes"
+  - `osd-level=0` -- 去除所有 mpv 渲染在视频上的 OSD 信息，避免禁音 mpv 时显示 "Mute: yes"
 - `"*"` -- 显示在所有屏幕上
 - `/home/Video/Wallpapers` -- # 播放的可以是视频文件或者包含视频文件的文件夹
 
-参数过多，可以设置mpv配置文件，再引用配置文件`~/.config/mpv/mpv.conf`，详细见<https://mpv.io/manual/master/#configuration-files>：
+参数过多，可以设置 mpv 配置文件，再引用配置文件 `~/.config/mpv/mpv.conf` ，详细见 <https://mpv.io/manual/master/#configuration-files>：
 
 ```conf
 [mpvpaper]
@@ -267,93 +268,43 @@ osd-level=0
 exec-once = mpvpaper -f -n 7200 -o "profile=mpvpaper" "*" /home/Videos/Wallpapers
 ```
 
-### 设置mpvpaper桌面图层排序
+### 设置 mpvpaper 桌面图层排序
 
-此外，为避免视频桌面被其他桌面程序覆盖(HyDE中是swww-daemon)，可以设置mpvpaper的layer优先度最低，或者直接不启动其他桌面程序：
+此外，为避免视频桌面被其他桌面程序覆盖 (HyDE 中是swww-daemon )，可以设置 mpvpaper 的 layer 优先度最低，或者直接不启动其他桌面程序：
 
 ```conf
 layerrule = order -1, mpvpaper
 ```
 
-### 自动暂停、禁音
+### 控制 mpvpaper 命令
 
-mpvpaper提供`--auto-pause`和`--auto-stop`的参数，但在hyprland中没有效果，因此自己写了两个脚本：
-
-- [auto_pause_mute_mpvpaper.sh](https://gist.github.com/coinhere/b97695322f9079a2178bb55120f2a795)，作用是：
-  - 工作区窗口数量由0变为1时静音，由1变为0时取消静音
-  - 窗口全屏时（非最大化）暂停，退出全屏时取消暂停
-  - 切换工作区后，根据工作区窗口数量和是否全屏选择禁音、暂停mpvpaper与否
-- [mpvpaper.sh](https://gist.github.com/coinhere/b97695322f9079a2178bb55120f2a795#file-mpvpaper-sh)，作用是：
-  - 如果以及有mpvpaper.sh进程则直接退出
-  - 启动mpvpaper和auto_pause_mute_mpvpaper.sh
-  - 退出时关闭mpvpaper和auto_pause_mute_mpvpaper.sh
-  - 每隔一秒检测系统是否有其他音频输出，有则将mpvpaper音量降至零
-
-需要开启mpvpaper控制接口，并安装`socat`
-
-自动启动修改为：
+前提是已经设置了 `input-ipc-server=/tmp/mpv-socket` -- 提供 mpvpaper 的控制接口。并安装`socat`。
 
 ```conf
-exec-once = $HOME/.config/hypr/scripts/mpvpaper.sh
-```
-
-### 添加控制壁纸快捷键
-
-在`~/.config/hypr/keybindings.conf`：
-
-需要开启mpvpaper控制接口，并安装`socat`
-
-```conf
-# mpv-paper
-# 切换mpvpaper运行状态，关闭/启动mpvpaper及相关进程
-bindd = $mainMod, F4, $d toggle mpvpaper, exec, pkill -x mpvpaper.sh >/dev/null || ~/.config/hypr/scripts/mpvpaper.sh
 bindd = $mainMod, F5, $d toggle mpvpaper voice, exec, echo 'cycle mute' | socat - /tmp/mpv-socket # 静音/取消静音
 bindd = $mainMod, F6, $d mpvpaper play prev, exec, echo 'playlist-prev' | socat - /tmp/mpv-socket # 播放上一个
 bindd = $mainMod, F7, $d toggle mpvpaper play, exec, echo 'cycle pause' | socat - /tmp/mpv-socket # 暂停/取消暂停
 bindd = $mainMod, F8, $d mpvpaper play next, exec, echo 'playlist-next' | socat - /tmp/mpv-socket # 播放下一个
 ```
 
-### 自动退出、启动动态壁纸
-
-hyprlock锁屏时，动态壁纸还会运行，因此写了个脚本锁屏时退出mpvpaper，解锁时再打开mpvpaper，这里使用上面脚本启动mpvpaper：
-
-```bash
-#!/bin/bash
-
-lock() {
-  # avoid starting multiple hyprlock instances.
-  if ! pidof hyprlock >/dev/null; then
-    # quit mpvpaper script
-    pkill -x mpvpaper.sh
-    # pause music
-    # playerctl pause
-    # when unlock, restart mpvpaper
-    lockscreen.sh && lock_hook
-  fi
-}
-
-lock_hook() {
-  # run mpvpaper again
-  # playerctl play
-  ~/.config/hypr/scripts/mpvpaper.sh
-}
-
-lock
-```
-
 ## 改键
 
 需求：
 
-- `CapsLock`单击为`Escape`
+- `Esc`(Vim 用) 和 `Ctrl` 方便点击，保护小指头。
+- 方向键（上下左右）和导航键（翻页、`home`、`end`）在主键盘区有快捷键，方便补全和搜索以及命令行的导航。
+
+方案：
+
+- `CapsLock` 单击为`Escape`
 - `CapsLock` + `f,b,p,n,a,e,u,d` = `right`, `left`, `up`, `down`, `home`, `end`, `pageup`, `pagedown`
 - `CapsLock` + `h,j,k,l` = `left`, `down`, `up`, `right`
 - `Escape`为`CapsLock`
-- 右`Ctrl`键与右`Alt`键互换
+- 右`Ctrl`键与右`Alt`键互换，右手大拇指负责按 `Ctrl`
 
-这里选用[keyd](https://github.com/rvaiya/keyd)来改键，如果只是单纯交换键位可以使用Hyprland自带的[改键配置]()，
+这里选用 [keyd](https://github.com/rvaiya/keyd) 来改键
 
-安装并启用keyd：
+安装并启用 keyd：
 
 ```bash
 sudo pacman -S keyd
@@ -366,7 +317,7 @@ sudo systemctl enable --now keyd
 sudo keyd monitor
 ```
 
-添加配置文件`/etc/keyd/default.conf`，如下所示：
+添加配置文件 `/etc/keyd/default.conf`，如下所示：
 
 ```conf
 [ids]
@@ -375,10 +326,7 @@ sudo keyd monitor
 
 [main]
 
-# Maps capslock to escape when pressed and control when held.
 capslock = overload(capslock_layer, esc)
-
-# Remaps the escape key to capslock
 esc = capslock
 rightalt = rightcontrol
 rightshift = rightshift
@@ -405,6 +353,19 @@ backspace = delete
 ```bash
 sudo keyd reload
 ```
+
+## 字体
+
+采用类苹果字体方案：
+
+- 中文字体：苹方字体
+- 英文字体：Inter
+- 等宽字体：Maple Mono NF CN
+- emoji：apple color emoji
+
+详细见 <https://github.com/wxmup/linux-fonts-from-apple?tab=readme-ov-file#readme>
+
+maple 字体 Github releases: <https://github.com/subframe7536/maple-font/releases>
 
 ## 其他推荐的应用
 
