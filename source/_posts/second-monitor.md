@@ -87,8 +87,6 @@ for p in /sys/class/drm/*/status; do con=${p%/status}; echo -n "${con#*/card?-}:
 sudo nvim /etc/default/grub
 ```
 
-这里我使用的EDID文件是之前修复小新EDID文件错误时用的，具体见<https://coinhere.fra1.zeabur.app/2024/10/13/arch-hyprland/>
-
 ```grub
 GRUB_CMDLINE_LINUX_DEFAULT="loglevel=5 nowatchdog drm.edid_firmware=eDP-1:edid/EDID-fix.bin,DP-2:edid/EDID-fix.bin video=DP-2:e nvidia_drm.modeset=1"
 ```
@@ -174,7 +172,6 @@ fi
 我们修改内核参数和系统名字——与原系统区别：
 
 ```
-# Added by coinhere to add 2rd screen grub start entry.
 GRUB_CMDLINE_LINUX_DEFAULT="${GRUB_CMDLINE_LINUX_DEFAULT} drm.edid_firmware=DP-2:edid/EDID-fix.bin video=DP-2:e"
 
 if [ "x${GRUB_DISTRIBUTOR}" = "x" ] ; then
