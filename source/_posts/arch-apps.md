@@ -393,6 +393,12 @@ electron 相关请查阅：<https://wiki.archlinux.org/title/Wayland#Electron>, 
 
 个人习惯最简化设置，能不动的就不动。
 
+#### 添加 prime password
+
+也适用于 firefox。为密码管理页面添加一个主密码。
+
+见 <https://support.mozilla.org/en-US/kb/use-primary-password-protect-stored-logins>
+
 #### 透明边栏
 
 地址栏：`about:config`，`zen.widget.linux.transparency` 设置为 true，仅适用于 Linux 系统。
