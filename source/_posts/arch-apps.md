@@ -52,6 +52,86 @@ Quick Shell 版本正在积极开发中，因此会出现各种 bug
 
 基于壁纸颜色自动设定主题颜色。
 
+## 改键
+
+需求：
+
+- `Esc`(Vim 用) 和 `Ctrl` 方便点击，保护小指头。
+- 方向键（上下左右）和导航键（翻页、`home`、`end`）在主键盘区有快捷键，方便补全和搜索以及命令行的导航。
+
+方案：
+
+- `CapsLock` 单击为`Escape`
+- `CapsLock` + `f,b,p,n,a,e,u,d` = `right`, `left`, `up`, `down`, `home`, `end`, `pageup`, `pagedown`
+- `CapsLock` + `h,j,k,l` = `left`, `down`, `up`, `right`
+- `Escape`为`CapsLock`
+- 右`Ctrl`键与右`Alt`键互换，右手大拇指负责按 `Ctrl`
+
+这里选用 [keyd](https://github.com/rvaiya/keyd) 来改键
+
+安装并启用 keyd：
+
+```bash
+sudo pacman -S keyd
+sudo systemctl enable --now keyd
+```
+
+要查看各个键位的名称，运行并按下要查看的键位：
+
+```bash
+sudo keyd monitor
+```
+
+添加配置文件 `/etc/keyd/default.conf`，如下所示：
+
+```conf
+[ids]
+
+*
+
+[main]
+
+capslock = overload(capslock_layer, esc)
+esc = capslock
+rightalt = rightcontrol
+rightshift = rightshift
+
+[capslock_layer]
+f = right
+b = left
+p = up
+n = down
+a = home
+e = end
+u = pageup
+d = pagedown
+h = left
+j = down
+k = up
+l = right
+space = backspace
+backspace = delete
+```
+
+运行以下命令来重载配置：
+
+```bash
+sudo keyd reload
+```
+
+## 字体
+
+采用类苹果字体方案：
+
+- 中文字体：苹方字体
+- 英文字体：Inter
+- 等宽字体：Maple Mono NF CN
+- emoji：apple color emoji
+
+详细见 <https://github.com/wxmup/linux-fonts-from-apple?tab=readme-ov-file#readme>
+
+maple 字体 Github releases: <https://github.com/subframe7536/maple-font/releases>
+
 ## 安装配置输入法
 
 输入法和桌面环境/窗口管理器关联较大，这里的配置仅在 `Hyprland` 下测试过。
@@ -183,7 +263,7 @@ yay -S fcitx5-skin-fluentlight-git
 
 ### SDDM 主题
 
-SDDM 主题可按自己的喜好下载。这里推荐 [sddm-astronaut-theme](https://github.com/Keyitdev/sddm-astronaut-theme)，里面集成许多主题，可以自行选择。
+SDDM 主题可按自己的喜好下载。这里推荐 [SilentSDDM](https://github.com/Keyitdev/sddm-astronaut-theme) 和 [sddm-astronaut-theme](https://github.com/Keyitdev/sddm-astronaut-theme)，里面集成许多主题，可以自行选择。
 
 主题目录基本都是 `/usr/share/sddm/themes/<theme-name>`。
 
@@ -287,85 +367,47 @@ bindd = $mainMod, F7, $d toggle mpvpaper play, exec, echo 'cycle pause' | socat 
 bindd = $mainMod, F8, $d mpvpaper play next, exec, echo 'playlist-next' | socat - /tmp/mpv-socket # 播放下一个
 ```
 
-## 改键
+## 浏览器的设定
 
-需求：
+firefox 系的浏览器在 Linux 上可以开箱即用。
 
-- `Esc`(Vim 用) 和 `Ctrl` 方便点击，保护小指头。
-- 方向键（上下左右）和导航键（翻页、`home`、`end`）在主键盘区有快捷键，方便补全和搜索以及命令行的导航。
+Chromium 系（google-chrome, edge, Chromium）为适配 wayland 和输入法需要设置额外的启动参数——对应嵌入了 Chromium 的 Electron APPs 同样如此。
 
-方案：
+具体参数如下所示，具体意义可在 <https://wiki.archlinux.org/title/Chromium> 中查到：
 
-- `CapsLock` 单击为`Escape`
-- `CapsLock` + `f,b,p,n,a,e,u,d` = `right`, `left`, `up`, `down`, `home`, `end`, `pageup`, `pagedown`
-- `CapsLock` + `h,j,k,l` = `left`, `down`, `up`, `right`
-- `Escape`为`CapsLock`
-- 右`Ctrl`键与右`Alt`键互换，右手大拇指负责按 `Ctrl`
-
-这里选用 [keyd](https://github.com/rvaiya/keyd) 来改键
-
-安装并启用 keyd：
-
-```bash
-sudo pacman -S keyd
-sudo systemctl enable --now keyd
+```.conf
+--password-store=gnome-libsecret
+--ozone-platform-hint=wayland
+--gtk-version=4
+--enable-features=TouchpadOverscrollHistoryNavigation
+--enable-wayland-ime
 ```
 
-要查看各个键位的名称，运行并按下要查看的键位：
+electron 相关请查阅：<https://wiki.archlinux.org/title/Wayland#Electron>, <
 
-```bash
-sudo keyd monitor
-```
+### 浏览器推荐
 
-添加配置文件 `/etc/keyd/default.conf`，如下所示：
+如果你喜欢垂直标签页，可以尝试一下 [Zen Browser](https://zen-browser.app/)，开源免费。
 
-```conf
-[ids]
+### Zen Browser 设置
 
-*
+个人习惯最简化设置，能不动的就不动。
 
-[main]
+#### 透明边栏
 
-capslock = overload(capslock_layer, esc)
-esc = capslock
-rightalt = rightcontrol
-rightshift = rightshift
+地址栏：`about:config`，`zen.widget.linux.transparency` 设置为 true，仅适用于 Linux 系统。
 
-[capslock_layer]
-f = right
-b = left
-p = up
-n = down
-a = home
-e = end
-u = pageup
-d = pagedown
-h = left
-j = down
-k = up
-l = right
-space = backspace
-backspace = delete
-```
+#### 去掉页面周围的间距
 
-运行以下命令来重载配置：
+地址栏：`about:config`，`zen.theme.content-element-separation` 设置为 0。Hyprland 已有一个间距了。
 
-```bash
-sudo keyd reload
-```
+#### 滚轮滑动切换标签页
 
-## 字体
+`toolkit.tabbox.switchByScrolling` 设置为 true
 
-采用类苹果字体方案：
+#### RTX Video Super Resolution
 
-- 中文字体：苹方字体
-- 英文字体：Inter
-- 等宽字体：Maple Mono NF CN
-- emoji：apple color emoji
-
-详细见 <https://github.com/wxmup/linux-fonts-from-apple?tab=readme-ov-file#readme>
-
-maple 字体 Github releases: <https://github.com/subframe7536/maple-font/releases>
+支持与否见 <https://nvidia.custhelp.com/app/answers/detail/a_id/5448/~/rtx-video-faq> 的 COMPATIBILITY & BEHAVIOR
 
 ## 其他推荐的应用
 
