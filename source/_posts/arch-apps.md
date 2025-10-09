@@ -403,6 +403,8 @@ electron 相关请查阅：<https://wiki.archlinux.org/title/Wayland#Electron>, 
 
 地址栏：`about:config`，`zen.widget.linux.transparency` 设置为 true，仅适用于 Linux 系统。
 
+如果想要侧边栏（书签、历史）也透明，可以考虑安装 [Transparent Zen](https://zen-browser.app/mods/642854b5-88b4-4c40-b256-e035532109df/?q=transparen)
+
 #### 去掉页面周围的间距
 
 地址栏：`about:config`，`zen.theme.content-element-separation` 设置为 0。Hyprland 已有一个间距了。
