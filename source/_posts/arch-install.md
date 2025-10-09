@@ -46,13 +46,14 @@ Arch Linux 安装镜像自带 `arch-install-scripts` 包，因此无须安装该
 [arch-install-scripts](https://archlinux.org/packages/?name=arch-install-scripts) 这个包里面是一些安装 Arch Linux 必须要用到的命令，如 `pacstrap` 和 `arch-chroot`
 [dosfstools](https://archlinux.org/packages/core/x86_64/dosfstools/)，这个包是一些格式化分区的命令，如：`mkfs.fat`。
 [ntfs-3g](https://wiki.archlinux.org/title/NTFS-3G)，用于格式化 Windows 的 NTFS 分区。
+exfatprogs, 用于格式化 exFAT 分区
 {% endnote %}
 
-运行下面的命令，以更新系统并安装 `arch-install-scripts` 和 `dosfstools` 以及 `ntfs-3g`:
+运行下面的命令，以更新系统并安装 `arch-install-scripts` 和 `dosfstools` 以及 `ntfs-3g` `exfatprogs`:
 
 ```bash
 sudo pacman -Syu
-sudo pacman -S arch-install-scripts dosfstools ntfs-3g
+sudo pacman -S arch-install-scripts dosfstools ntfs-3g exfatprogs
 ```
 
 最后，将移动硬盘装入硬盘盒并接入电脑，运行 `sudo fdisk -l` 查看硬盘分区情况，确定系统已识别到硬盘（一般为 `/dev/sda`）。
@@ -73,9 +74,9 @@ su
 cfdisk /dev/sda # 安装 archlinux 的磁盘分区
 ```
 
-这里这里按[官方安装指南的提示](https://wiki.archlinux.org/title/Install_Arch_Linux_on_a_removable_medium#Installation_tweaks)，增加了一个 128G 大小的 Windows 的 NTFS 分区。
+这里这里按[官方安装指南的提示](https://wiki.archlinux.org/title/Install_Arch_Linux_on_a_removable_medium#Installation_tweaks)，增加了一个 128G 大小的 ntfs 或 exFAT 分区。
 
-这样一来，这个安装了 Arch Linux 系统的移动硬盘仍然可以作为一个 128G 的**移动硬盘**使用。为避免可能无法识别该分区，将第一个分区设为 NTFS 分区。
+这样一来，这个安装了 Arch Linux 系统的移动硬盘仍然可以作为一个 128G 的**移动硬盘**使用。为避免可能无法识别该分区，将其设在第一个分区。
 
 ![分区示例](arch-install/cfdisk-example.png)
 
@@ -88,7 +89,7 @@ cfdisk /dev/sda # 安装 archlinux 的磁盘分区
 运行下面命令，格式化分区，注意将各个分区名替换成你对应的分区：
 
 ```bash
-mkfs.ntfs -L mySSD /dev/sda1 # 格式化NTFS分区
+mkfs.exfat -L mySSD /dev/sda1 # 格式化exFAT分区
 mkfs.fat -F 32 /dev/sda2 # 格式化EFI分区，双系统注意不要运行这步
 mkswap /dev/sda3 # 格式化Swap分区
 mkfs.btrfs -L myArch /dev/sda4 # 格式化Btrfs分区
@@ -110,7 +111,7 @@ umount /mnt
 mount -t btrfs -o subvol=/@,compress=zstd /dev/sda4 /mnt # 挂载 / 到 /mnt
 mount --mkdir -t btrfs -o subvol=/@home,compress=zstd /dev/sda4 /mnt/home # 挂载 /home 到 /mnt/home 
 mount --mkdir /dev/sda2 /mnt/boot # 挂载 /boot 到 /mnt/boot
-mount --mkdir -t ntfs3 /dev/sda1 /mnt/media/mySSD # 挂载NTFS数据分区，用于生成fstab后自动挂载
+mount --mkdir -t exfat /dev/sda1 /mnt/media/mySSD # 挂载exFAT数据分区，用于生成fstab后自动挂载
 swapon /dev/sda3 # 启用交换分区
 ```
 
@@ -514,4 +515,3 @@ env = __GLX_VENDOR_LIBRARY_NAME,nvidia # Disable this if you have issues with sc
 ```
 
 {% endnote %}
-
