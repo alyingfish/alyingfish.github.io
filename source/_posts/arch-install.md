@@ -29,7 +29,9 @@ banner_img:
 
 ### 安装前准备
 
-因为是通过**已有的 Arch Linux 系统**，在移动硬盘上安装一个新的 Arch Linus 系统。因此需要安装 [arch-install-scripts](https://archlinux.org/packages/?name=arch-install-scripts) 和 [dosfstools](https://archlinux.org/packages/core/x86_64/dosfstools/) 这两个包，以及 [ntfs-3g](https://wiki.archlinux.org/title/NTFS-3G)。
+因为是通过**已有的 Arch Linux 系统**，在移动硬盘上安装一个新的 Arch Linus 系统。因此需要安装 [arch-install-scripts](https://archlinux.org/packages/?name=arch-install-scripts) 和 [dosfstools](https://archlinux.org/packages/core/x86_64/dosfstools/) 这两个包。
+
+如果要另外添加 exFAT 或 NTFS 分区的话，需要安装 [exfatprogs](https://archlinux.org/packages/extra/x86_64/exfatprogs/) 或 [ntfs-3g](https://wiki.archlinux.org/title/NTFS-3G)。
 
 {% note info %}
 **Tip**
@@ -45,8 +47,8 @@ Arch Linux 安装镜像自带 `arch-install-scripts` 包，因此无须安装该
 
 [arch-install-scripts](https://archlinux.org/packages/?name=arch-install-scripts) 这个包里面是一些安装 Arch Linux 必须要用到的命令，如 `pacstrap` 和 `arch-chroot`
 [dosfstools](https://archlinux.org/packages/core/x86_64/dosfstools/)，这个包是一些格式化分区的命令，如：`mkfs.fat`。
-[ntfs-3g](https://wiki.archlinux.org/title/NTFS-3G)，用于格式化 Windows 的 NTFS 分区。
-exfatprogs, 用于格式化 exFAT 分区
+[ntfs-3g](https://wiki.archlinux.org/title/NTFS-3G)，包含用于格式化 Windows 的 NTFS 分区的命令。
+[exfatprogs](https://archlinux.org/packages/extra/x86_64/exfatprogs/), 包含用于格式化 exFAT 分区的命令。
 {% endnote %}
 
 运行下面的命令，以更新系统并安装 `arch-install-scripts` 和 `dosfstools` 以及 `ntfs-3g` `exfatprogs`:
@@ -137,7 +139,7 @@ pacstrap -c /mnt base base-devel linux linux-firmware btrfs-progs
 # 因为使用btrfs文件系统，额外安装一个btrfs-progs包
 pacstrap -c /mnt amd-ucode intel-ucode # 移动硬盘跨平台，因此都AMD和intel的微码都装上
 pacstrap -c /mnt networkmanager bluez bluez-utils # 网络, 蓝牙
-pacstrap -c /mnt vim sudo fish man-db man-pages texinfo
+pacstrap -c /mnt nvim sudo fish man-db man-pages texinfo # 编辑器等
 ```
 
 ### 生成 fstab 文件
@@ -148,33 +150,14 @@ Linux 根据 fstab 文件来在启动时自动挂载分区。
 
 ```bash
 genfstab -U /mnt >> /mnt/etc/fstab # 生成fstab文件
-vim /mnt/etc/fstab # 查看并修改fstab文件
+nvim /mnt/etc/fstab # 查看并修改fstab文件
 ```
 
-{% fold info @fstab 文件内容 %}
+修改 /dev/sda1 分区的选项如下所示，以确保该分区用户具有读/写权限：
 
 ```fstab
-# Static information about the filesystems.
-# See fstab(5) for details.
-
-# <file system> <dir> <type> <options> <dump> <pass>
-# /dev/sda4 LABEL=myArch
-UUID=45d66bde-e5e8-4fba-a1da-5df7515db012 /          btrfs      rw,relatime,compress=zstd:3,ssd,space_cache=v2,subvol=/@ 0 0
-
-# /dev/sda1 LABEL=mySSD
-UUID=665A10451B482D7E /media/mySSD ntfs3      rw,relatime,uid=0,gid=0,iocharset=utf8 0 0
-
-# /dev/sda4 LABEL=myArch
-UUID=45d66bde-e5e8-4fba-a1da-5df7515db012 /home      btrfs      rw,relatime,compress=zstd:3,ssd,space_cache=v2,subvol=/@home 0 0
-
-# /dev/sda2
-UUID=846E-E7FA       /boot      vfat       rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro 0 2
-
-# /dev/sda3
-UUID=27cffd9b-b123-4a02-bc8c-0a594937e826 none       swap       defaults   0 0
+UUID=YOUR_DRIVE_UUID /media/mySSD exfat defaults,nofail,uid=1000,gid=1000,umask=000 0 0
 ```
-
-{% endfold %}
 
 {% note warning %}
 **注意**
@@ -204,7 +187,7 @@ echo "myArch" > /etc/hostname # 添加主机名，这里是myArch
 设置 `hosts` 文件：
 
 ```bash
-vim /etc/hosts
+nvim /etc/hosts
 ```
 
 加入下面内容，注意要和主机名一致：
@@ -225,7 +208,7 @@ hwclock --systohc # 同步硬件时间，此命令假定硬件时钟已设置为
 `Locale` 决定了软件使用的语言、书写习惯和字符集。
 
 ```bash
-vim /etc/locale.gen # 去掉注释 en_US.UTF-8 UTF-8 以及 zh_CN.UTF-8 UTF-8
+nvim /etc/locale.gen # 去掉注释 en_US.UTF-8 UTF-8 以及 zh_CN.UTF-8 UTF-8
 locale-gen
 echo 'LANG=en_US.UTF-8' > /etc/locale.conf # 设置系统语言
 ```
@@ -294,14 +277,14 @@ grub-install --target=x86_64-efi --efi-directory=/boot --removable --recheck
 - 添加/取消这一行的注释：GRUB_DISABLE_OS_PROBER=false，启用 os-prober
 
 ```bash
-vim /etc/default/grub
+nvim /etc/default/grub
 grub-mkconfig -o /boot/grub/grub.cfg
 ```
 
 {% note warning %}
 **注意**
 
-若 Windows 安装在另一个硬盘中则不会输出, 可在进入系统后挂载硬盘并重新执行 `grub-mkconfig -o /boot/grub/grub.cfg`
+若 Windows 安装在另一个硬盘中则现在不会被检测到, 可在重新进入系统后并再次执行 `grub-mkconfig -o /boot/grub/grub.cfg`
 {% endnote %}
 
 ### 安装完成
@@ -330,7 +313,7 @@ reboot # 重启
 systemctl enable --now NetworkManager
 # 如果使用WiFi，运行以下命令
 nmcli dev wifi list
-nmcli dev wifi connect "wifi SSID" password "password"
+nmcli dev wifi connect <wifi SSID> --ask
 ping www.bilibili.com # 测试网络连接
 ```
 
@@ -339,7 +322,7 @@ ping www.bilibili.com # 测试网络连接
 ```bash
 useradd -m -G wheel -s /bin/bash myusername # 创建用户及用户家目录
 passwd myusername # 设置密码
-EDITOR=vim visudo # 启用用户组权限，注释掉这一行：#%wheel ALL=(ALL:ALL) ALL
+EDITOR=nvim visudo # 启用用户组权限，注释掉这一行：#%wheel ALL=(ALL:ALL) ALL
 ```
 
 #### 用户设置
@@ -347,7 +330,7 @@ EDITOR=vim visudo # 启用用户组权限，注释掉这一行：#%wheel ALL=(AL
 更改默认编辑器，在 `/root/.bash_profile` 及 `/home/myusername/.bash_profile` 中加入：
 
 ```
-export EDITOR='vim'
+export EDITOR='nvim'
 ```
 
 更改默认 shell:
@@ -387,8 +370,8 @@ sudo pacman -S sof-firmware alsa-firmware alsa-ucm-conf # 声音固件
 sudo pacman -S adobe-source-han-serif-cn-fonts wqy-zenhei # 安装几个开源中文字体。一般装上文泉驿就能解决大多 wine 应用中文方块的问题
 sudo pacman -S noto-fonts noto-fonts-cjk noto-fonts-emoji noto-fonts-extra # 安装谷歌开源字体及表情
 sudo pacman -S archlinuxcn-keyring # cn 源中的签名（archlinuxcn-keyring 在 archlinuxcn）
-sudo pacman -S yay # yay 命令可以让用户安装 AUR 中的软件（yay 在 archlinuxcn）
-yay -S ttf-ms-win11-auto-zh_cn # 微软字体
+sudo pacman -S paru
+paru -S ttf-ms-win11-auto-zh_cn # 微软字体
 ```
 
 `archlinuxcn-keyring` 可能会报错，解决方法请查阅：<https://www.archlinuxcn.org/archlinuxcn-keyring-manually-trust-farseerfc-key/>
@@ -499,19 +482,20 @@ sudo mkinitcpio -P
 
 对于 Wayland，Nvidia 还需要设置 [DRM 内核级显示模式设置](https://wiki.archlinuxcn.org/wiki/Wayland#%E7%B3%BB%E7%BB%9F%E9%9C%80%E6%B1%82)，不然可能会导致黑屏
 
-添加[环境变量](https://wiki.archlinuxcn.org/wiki/%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F)，在 `/etc/environment` 中添加:
+添加[环境变量](https://wiki.archlinuxcn.org/wiki/%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F)，在 `/etc/environment` 中或 `~/.config/environment.d/nvidia.conf` 添加:
 
 ```text
 GBM_BACKEND=nvidia-drm
 __GLX_VENDOR_LIBRARY_NAME=nvidia
+LIBVA_DRIVER_NAME=nvidia
 ```
 
 Hyprland 则按如下设置，详细查看 <https://wiki.hypr.land/Nvidia/>：
 
 ```conf
-env = LIBVA_DRIVER_NAME,nvidia
 env = GBM_BACKEND,nvidia-drm
 env = __GLX_VENDOR_LIBRARY_NAME,nvidia # Disable this if you have issues with screensharing
+env = LIBVA_DRIVER_NAME,nvidia
 ```
 
 {% endnote %}
