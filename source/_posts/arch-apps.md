@@ -189,6 +189,20 @@ Section "InputClass"
 EndSection
 ```
 
+### BUG 处理（小新 Pro 14 2023 EDID 错误）
+
+小新 Pro 14 2023 的 EDID 校验码错误，导致显示器帧率无法调至 120 Hz
+
+详细解决方法可参考：<https://github.com/dgroenen/lenovo-ideapad-pro-5-14-14APH8-120hz-fix>
+
+```bash
+# 先下载修复后的 `edid-fixed.bin` 文件
+sudo mkdir /lib/firmware/edid
+sudo mv ~/Downloads/edid-fixed.bin /lib/firmware/edid/edid-fixed.bin
+# 在 grub 里添加内核参数：drm.edid_firmware=eDP-1:edid/edid-fixed.bin
+sudo nvim /etc/default/grub
+```
+
 ## 用户级设置
 
 用户级的配置文件为用户主目录下的配置文件`~/`。
