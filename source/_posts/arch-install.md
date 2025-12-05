@@ -394,7 +394,7 @@ sudo systemctl enable --now cronie # 启用Timeshift自动备份
 
 因为还没有安装桌面环境/窗口管理器，需要手动设置 timeshift。
 
-也可以在选择先安装一个桌面环境/窗口管理器，设置好 timeshift 备份后，再安装显卡驱动。timeshift 图形界面的设置可参考[简明指南](hitps://arch.icekylin.online/guide/rookie/desktop-env-and-app.html#_12-%E8%AE%BE%E7%BD%AE-timeshift-%E5%BF%AB%E7%85%A7)。
+也可以在选择先安装一个临时的桌面环境，设置好 timeshift 备份后，再安装显卡驱动。timeshift 图形界面的设置可参考[简明指南](hitps://arch.icekylin.online/guide/rookie/desktop-env-and-app.html#_12-%E8%AE%BE%E7%BD%AE-timeshift-%E5%BF%AB%E7%85%A7)。
 
 修改 `/etc/timeshift/timeshift.json` 如下，UUID 通过运行 `blkid` 来查看。
 
@@ -444,12 +444,6 @@ timeshift --create --comments "after install" --tags D # 创建快照，标签�
 
 ### 安装显卡驱动
 
-{% note info %}
-**Tip**
-
-如果使用 [Hyprland](https://hypr.land/) 的 [HyDE](https://github.com/HyDE-Project/HyDE) 配置，安装该配置时会自动根据安装驱动并进行相关配置。
-{% endnote %}
-
 因为是移动硬盘，且笔者使用的机器是 `Intel 核显` + `NVIDIA 独显` 以及 `AMD 核显笔记本`，我安装的是：
 
 ```bash
@@ -488,14 +482,6 @@ sudo mkinitcpio -P
 GBM_BACKEND=nvidia-drm
 __GLX_VENDOR_LIBRARY_NAME=nvidia
 LIBVA_DRIVER_NAME=nvidia
-```
-
-Hyprland 则按如下设置，详细查看 <https://wiki.hypr.land/Nvidia/>：
-
-```conf
-env = GBM_BACKEND,nvidia-drm
-env = __GLX_VENDOR_LIBRARY_NAME,nvidia # Disable this if you have issues with screensharing
-env = LIBVA_DRIVER_NAME,nvidia
 ```
 
 {% endnote %}
