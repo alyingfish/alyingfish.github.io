@@ -1,10 +1,12 @@
 ---
-title: Arch Linux 桌面环境与应用安装配置
+title: Arch Linux 桌面环境安装配置
 date: 2025-07-19 22:12:45
 categories:
   - [系统安装与配置, Arch Linux]
 tags:
   - Archlinux
+  - Hyprland
+  - Niri
 index_img:
 banner_img:
 ---
@@ -27,6 +29,23 @@ banner_img:
 
 对于平铺式窗口管理器，推荐 [Hyprland](https://hypr.land/)。
 
+2025年12月，笔者已经转到了 Niri。Niri 属于滚动式平铺窗口管理器。
+
+一般的平铺式窗口管理器，窗口的打开和关闭尽管不会遮挡原有的窗口，但却会改变原有窗口的空间。如果希望旧窗口的大小不变，就要在新工作区创建。而工作区的增多，又会使得工作区的管理变得复杂。
+
+比如，一项任务往往涉及几个工作区（浏览器、编辑器、终端），放在一个工作区太挤了。如果有多项并行的任务（不同的浏览器窗口、编辑器、终端），那么工作区之间就容易弄混，也不方便切换。
+
+滚动式平铺窗口管理器不同，窗口的打开和关闭不会改变原有窗口的空间，一个工作区的大小也不再局限于屏幕的大小，而是一个左右无限延伸的平面。这意味着，一个任务的所有相关窗口都可以平铺的放置在同一个工作区。工作区之间的切换意味着任务的切换。
+
+Niri 作者推荐的工作流是：
+```
+这就是我使用工作区的方式。
+
+我通常会把浏览器放在最顶层的工作区，然后每个项目（或“事情”）对应一个工作区。每个工作区里我会打开一到两个刚好能容纳在显示器内的窗口，并经常切换它们。另外，我可能还会滚动到屏幕外一些额外的窗口，这些窗口通常是我很少用到的，或者是我快速关闭的临时窗口。如果需要另一个常驻窗口，我会把它放在一个新的工作区里。
+
+在工作过程中，我会经常上下移动工作区，以便一次性访问所需的内容。例如，我经常需要在浏览器和当前正在处理的内容之间切换，所以我总是把当前正在处理的内容移动到浏览器的正下方，这样只需一次“聚焦-工作区上下移动”就能快速找到我想要的内容。
+```
+
 ### Hyprland
 
 之所以选择 [Hyprland](https://hypr.land/)，最重要的就是其**动画和视觉效果**，然后就是**丰富强大可配置选项**以及 **Wayland 原生支持**。
@@ -48,11 +67,21 @@ Hyprland 并非开箱即用，需要大量的配置，因此可以先使用大�
 
 使用 Quick Shell，因此顶栏和其组件更美观，并且有 Dock 栏和左右侧边栏，以及虚拟桌面预览——实时的。
 
-Quick Shell 版本正在积极开发中，因此会出现各种 bug
-
 基于壁纸颜色自动设定主题颜色。
 
-## 改键
+### Niri
+
+安装指南见: <https://yalter.github.io/niri/Getting-Started.html>
+
+```bash
+sudo pacman -Syu niri xwayland-satellite xdg-desktop-portal-gnome xdg-desktop-portal-gtk alacritty fuzzel
+```
+
+## 系统级设置
+
+系统级设置为不在用户主目录下`~/`的配置。
+
+### 改键
 
 需求：
 
@@ -65,7 +94,7 @@ Quick Shell 版本正在积极开发中，因此会出现各种 bug
 - `CapsLock` + `f,b,p,n,a,e,u,d` = `right`, `left`, `up`, `down`, `home`, `end`, `pageup`, `pagedown`
 - `CapsLock` + `h,j,k,l` = `left`, `down`, `up`, `right`
 - `Escape`为`CapsLock`
-- 右`Ctrl`键与右`Alt`键互换，右手大拇指负责按 `Ctrl`
+- 右`Ctrl`键与右`Alt`键互换，方便右手大拇指按 `Ctrl`
 
 这里选用 [keyd](https://github.com/rvaiya/keyd) 来改键
 
@@ -119,24 +148,59 @@ backspace = delete
 sudo keyd reload
 ```
 
-## 字体
 
-采用类苹果字体方案：
+### GRUB 主题
 
-- 中文字体：苹方字体
-- 英文字体：Inter
-- 等宽字体：Maple Mono NF CN
-- emoji：apple color emoji
+这个仓库集成了许多好看的 GRUB 主题：<https://github.com/Jacksaur/Gorgeous-GRUB>
 
-详细见 <https://github.com/wxmup/linux-fonts-from-apple?tab=readme-ov-file#readme>
+这里推荐 [Elegant-grub2-themes](https://github.com/vinceliuice/Elegant-grub2-themes)
 
-maple 字体 Github releases: <https://github.com/subframe7536/maple-font/releases>
+#### Elegant-grub2-themes
 
-## 安装配置输入法
+从 `1f7907` 后，原有的 DejaVuSans 字体被替换成了 Grub 默认的 unifont 字体。为此你可能需要手动替换之前的字体，或使用在这之前的版本。
 
-输入法和桌面环境/窗口管理器关联较大，这里的配置仅在 `Hyprland` 下测试过。
+### SDDM
 
-### 安装输入法相关包
+#### SDDM 主题
+
+SDDM 主题可按自己的喜好下载。这里推荐 [SilentSDDM](https://github.com/Keyitdev/sddm-astronaut-theme) 和 [sddm-astronaut-theme](https://github.com/Keyitdev/sddm-astronaut-theme)，里面集成许多主题，可以自行选择。
+
+主题目录基本都是 `/usr/share/sddm/themes/<theme-name>`。
+
+设置方法见对应主题的说明。
+
+#### 设置 SDDM 触摸板轻触为点击
+
+SDDM 默认运行在 Xorg 上，因此要修改 X11 的设置：
+
+添加文件 `/etc/X11/xorg.conf.d/20-touchpad.conf` 并填入下面的内容：
+
+```conf
+Section "InputClass"
+        Identifier "libinput touchpad catchall"
+        MatchIsTouchpad "on"
+        MatchDevicePath "/dev/input/event*"
+        Driver "libinput"
+
+        Option "Tapping" "on"
+        Option "NaturalScrolling" "on"
+        Option "MiddleEmulation" "on"
+        Option "DisableWhileTyping" "on"
+EndSection
+```
+
+## 用户级设置
+
+用户级的配置文件为用户主目录下的配置文件`~/`。
+可在我的 [dotfiles](https://github.com/alyingfish/dotfiles) 中找到并同步——使用 [chezmoi](https://www.chezmoi.io/) 管理。时效以 dotfiles 中的文件最新。
+
+下面的为部分设置的详细说明。
+
+### 输入法
+
+输入法和桌面环境/窗口管理器关联较大，这里的配置仅在 `Hyprland`、`Niri` 下测试过。
+
+#### 安装输入法相关包
 
 ```bash
 sudo pacman -S fcitx5-im # 输入法基础包组
@@ -145,7 +209,7 @@ sudo pacman -S fcitx5-configtool # 输入法设置工具
 sudo pacman -S fcitx5-rime # 安装 rime 输入法
 ```
 
-### 添加环境变量
+#### 添加环境变量
 
 创建 `~/.config/environment.d/im.conf`，并添加(详细信息见 [fcitx5 in wayland](https://fcitx-im.org/wiki/Using_Fcitx_5_on_Wayland#Chromium_.2F_Electron))：
 
@@ -157,17 +221,7 @@ GLFW_IM_MODULE=ibus
 INPUT_METHOD=fcitx
 ```
 
-`Hyprland` 则在 `~/.config/hypr/userprefs.conf` 中添加：
-
-```conf
-env = XMODIFIERS,@im=fcitx
-env = QT_IM_MODULE,fcitx
-env = SDL_IM_MODULE, fcitx
-env = GLFW_IM_MODULE, ibus
-env = INPUT_METHOD, fcitx
-```
-
-### 启动fcitx5，安装rime输入法
+#### 启动fcitx5，安装rime输入法
 
 ```bash
 fcitx5 -d # 启动fcitx5
@@ -179,7 +233,7 @@ fcitx5 -d # 启动fcitx5
 
 第一次使用时，会自动生成 rime 配置文件，在 `~/.local/share/fcitx5/rime` 中。
 
-### 仅设置 `RightShift` 切换中英文输入法
+#### 仅设置 `RightShift` 切换中英文输入法
 
 我习惯仅使用 `RightShift` 切换输入法，这样不影响 `Shift` 输入大写。
 
@@ -187,7 +241,7 @@ fcitx5 -d # 启动fcitx5
 
 将 `RightShift` 设置为 `Trigger Input Method` 即可。
 
-### 使用雾凇拼音词库
+#### 使用雾凇拼音词库
 
 Rime 默认的中文输入是否简陋，这里推荐 [雾凇拼音](https://github.com/iDvel/rime-ice)。
 
@@ -230,7 +284,7 @@ patch:
 exec-once = fcitx5 --replace -d
 ```
 
-### 输入法美化
+#### 输入法美化
 
 这里使用 fcitx5 的 [FluentDark](https://github.com/Reverier-Xu/Fluent-fcitx5) 皮肤，透明黑色。
 
@@ -247,66 +301,22 @@ yay -S fcitx5-skin-fluentlight-git
 
 之后进入fcitx5-configtool，在 `Addons`-`UI`-`Classic User Interface` 中，在 `Theme` 和 `Dark Theme` 中下拉选中自己想要的主题即可。
 
-## GRUB
-
-### GRUB 主题
-
-这个仓库集成了许多好看的 GRUB 主题：<https://github.com/Jacksaur/Gorgeous-GRUB>
-
-这里推荐 [Elegant-grub2-themes](https://github.com/vinceliuice/Elegant-grub2-themes)
-
-### Elegant-grub2-themes
-
-从 `1f7907` 后，原有的 DejaVuSans 字体被替换成了 Grub 默认的 unifont 字体。为此你可能需要手动替换之前的字体，或使用在这之前的版本。
-
-## SDDM
-
-### SDDM 主题
-
-SDDM 主题可按自己的喜好下载。这里推荐 [SilentSDDM](https://github.com/Keyitdev/sddm-astronaut-theme) 和 [sddm-astronaut-theme](https://github.com/Keyitdev/sddm-astronaut-theme)，里面集成许多主题，可以自行选择。
-
-主题目录基本都是 `/usr/share/sddm/themes/<theme-name>`。
-
-设置方法见对应主题的说明。
-
-### 设置 SDDM 触摸板轻触为点击
-
-SDDM 默认运行在 Xorg 上，因此要修改 X11 的设置：
-
-添加文件 `/etc/X11/xorg.conf.d/20-touchpad.conf` 并填入下面的内容：
-
-```conf
-Section "InputClass"
-        Identifier "libinput touchpad catchall"
-        MatchIsTouchpad "on"
-        MatchDevicePath "/dev/input/event*"
-        Driver "libinput"
-
-        Option "Tapping" "on"
-        Option "NaturalScrolling" "on"
-        Option "MiddleEmulation" "on"
-        Option "DisableWhileTyping" "on"
-EndSection
-```
-
-## 动态壁纸
+### 动态壁纸
 
 这里使用 [mpvpaper](https://github.com/GhostNaN/mpvpaper)，可以将视频作为桌面，并支持mpv的设置。
 
-end-4 的 Hyprland 配置支持视频类型壁纸，并自动根据视频第一帧图像生成对应的主题颜色。因此可以跳过这一节。
-
-### 安装
+Archlinux 运行下面命令安装:
 
 ```bash
 sudo pacman -S mpvpaper
 ```
 
-### 设置自动启动
+#### mpvpaper 运行参数
 
-在 `~/.config/hypr/userprefs.conf` 中添加：
+运行命令为：
 
 ```conf
-exec-once = mpvpaper -f -n 7200 -o "input-ipc-server=/tmp/mpv-socket --shuffle --loop --loop-playlist --panscan=1.0 --osd-level=0" "*" /home/Videos/Wallpapers
+mpvpaper -f -n 7200 -o "input-ipc-server=/tmp/mpv-socket --shuffle --loop --loop-playlist --panscan=1.0 --osd-level=0" "*" /home/Videos/Wallpapers
 ```
 
 参数解释:
@@ -342,54 +352,26 @@ panscan=1.0
 osd-level=0
 ```
 
-之后自动启动便可写为：
+之后运行命令便可写为：
 
 ```conf
-exec-once = mpvpaper -f -n 7200 -o "profile=mpvpaper" "*" /home/Videos/Wallpapers
+mpvpaper -f -n 7200 -o "profile=mpvpaper" "*" /home/Videos/Wallpapers
 ```
 
-### 设置 mpvpaper 桌面图层排序
-
-此外，为避免视频桌面被其他桌面程序覆盖 (HyDE 中是swww-daemon )，可以设置 mpvpaper 的 layer 优先度最低，或者直接不启动其他桌面程序：
-
-```conf
-layerrule = order -1, mpvpaper
-```
-
-### 控制 mpvpaper 命令
+#### 控制 mpvpaper 命令
 
 前提是已经设置了 `input-ipc-server=/tmp/mpv-socket` -- 提供 mpvpaper 的控制接口。并安装`socat`。
 
 ```conf
-bindd = $mainMod, F5, $d toggle mpvpaper voice, exec, echo 'cycle mute' | socat - /tmp/mpv-socket # 静音/取消静音
-bindd = $mainMod, F6, $d mpvpaper play prev, exec, echo 'playlist-prev' | socat - /tmp/mpv-socket # 播放上一个
-bindd = $mainMod, F7, $d toggle mpvpaper play, exec, echo 'cycle pause' | socat - /tmp/mpv-socket # 暂停/取消暂停
-bindd = $mainMod, F8, $d mpvpaper play next, exec, echo 'playlist-next' | socat - /tmp/mpv-socket # 播放下一个
+echo 'cycle mute' | socat - /tmp/mpv-socket # 静音/取消静音
+echo 'playlist-prev' | socat - /tmp/mpv-socket # 播放上一个
+echo 'cycle pause' | socat - /tmp/mpv-socket # 暂停/取消暂停
+echo 'playlist-next' | socat - /tmp/mpv-socket # 播放下一个
 ```
 
-## 浏览器的设定
-
-firefox 系的浏览器在 Linux 上可以开箱即用。
-
-Chromium 系（google-chrome, edge, Chromium）为适配 wayland 和输入法需要设置额外的启动参数——对应嵌入了 Chromium 的 Electron APPs 同样如此。
-
-具体参数如下所示，具体意义可在 <https://wiki.archlinux.org/title/Chromium> 中查到：
-
-```.conf
---password-store=gnome-libsecret
---ozone-platform-hint=wayland
---gtk-version=4
---enable-features=TouchpadOverscrollHistoryNavigation
---enable-wayland-ime
-```
-
-electron 相关请查阅：<https://wiki.archlinux.org/title/Wayland#Electron>, <
-
-### 浏览器推荐
+### Zen Browser 设定
 
 如果你喜欢垂直标签页，可以尝试一下 [Zen Browser](https://zen-browser.app/)，开源免费。
-
-### Zen Browser 设置
 
 个人习惯最简化设置，能不动的就不动。
 
@@ -417,18 +399,4 @@ electron 相关请查阅：<https://wiki.archlinux.org/title/Wayland#Electron>, 
 
 支持与否见 <https://nvidia.custhelp.com/app/answers/detail/a_id/5448/~/rtx-video-faq> 的 COMPATIBILITY & BEHAVIOR
 
-## 其他推荐的应用
 
-- 科学上网。请查阅[简明指南-透明代理](https://arch.icekylin.online/guide/rookie/transparent.html)
-- [fish shell](https://fishshell.com/)——用户友好的 Shell，自带许多有用功能，比需要加载一堆插件的 zsh 启动要快的多。不如的是，fish shell 不兼容 POSIX
-- yazi
-- [neovim](https://neovim.io/)——完全兼容 vim，同时插件生态极其丰富。觉得配置麻烦的可以使用 [lazyvim](http://www.lazyvim.org/installation)，完全可以说是一个 IDE 了。
-- [neovide](https://neovide.dev/)——搭配 neovim，一个Neovim的图形用户界面。有更好的视觉及输入体验，动画丝滑无比。
-- [vscode](https://wiki.archlinux.org/title/Visual_Studio_Code)——无须多言。
-- [openRGB](https://openrgb.org/)——光污染必备
-- [btop](https://github.com/aristocratos/btop)——一个系统资源监视器，类似任务管理器
-- [pyprland](https://hyprland-community.github.io/pyprland/)——为 hyprland 用户提供了一下有用的插件，主要用到的是 `scratchpads`
-
-## 个性化配置
-
-关于 hyprland、终端、Shell、编辑器和各种软件的具体配置文件，可以查看我的 [dotfiles](https://github.com/alyingfish/dotfiles)
