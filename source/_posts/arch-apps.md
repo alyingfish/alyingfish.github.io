@@ -38,6 +38,7 @@ banner_img:
 滚动式平铺窗口管理器不同，窗口的打开和关闭不会改变原有窗口的空间，一个工作区的大小也不再局限于屏幕的大小，而是一个左右无限延伸的平面。这意味着，一个任务的所有相关窗口都可以平铺的放置在同一个工作区。工作区之间的切换意味着任务的切换。
 
 Niri 作者推荐的工作流是：
+
 ```
 这就是我使用工作区的方式。
 
@@ -74,7 +75,25 @@ Hyprland 并非开箱即用，需要大量的配置，因此可以先使用大�
 安装指南见: <https://yalter.github.io/niri/Getting-Started.html>
 
 ```bash
-sudo pacman -Syu niri xwayland-satellite xdg-desktop-portal-gnome xdg-desktop-portal-gtk alacritty fuzzel
+sudo pacman -Syu niri
+```
+
+一些必要的组件:
+
+```bash
+sudo pacman xdg-desktop-portal-gnome xdg-desktop-portal-gtk gnome-keyring # Portals
+sudo pacman -S xwayland-satellite # Xwayland
+sudo pacman -S polkit-gnome # 身份认证
+# 添加到 `~/.config/niri/config.kdl`
+# spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
+```
+
+以及一些基本的应用：
+
+```bash
+sudo pacman -S alacritty fuzzel
+sudo pacman -S mako # 一个轻量级通知 daemon
+systemctl --user add-wants niri.service mako.service
 ```
 
 ## 系统级设置
@@ -147,7 +166,6 @@ backspace = delete
 ```bash
 sudo keyd reload
 ```
-
 
 ### GRUB 主题
 
@@ -412,5 +430,3 @@ echo 'playlist-next' | socat - /tmp/mpv-socket # 播放下一个
 #### RTX Video Super Resolution
 
 支持与否见 <https://nvidia.custhelp.com/app/answers/detail/a_id/5448/~/rtx-video-faq> 的 COMPATIBILITY & BEHAVIOR
-
-
