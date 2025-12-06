@@ -180,13 +180,16 @@ sudo keyd reload
 
 ### SDDM
 
+sddm 的配置文件路径可参考：<https://man.archlinux.org/man/sddm.conf.5>
+，一般修改 `/etc/sddm.conf` 即可。
+
 #### SDDM 主题
 
-SDDM 主题可按自己的喜好下载。这里推荐 [SilentSDDM](https://github.com/Keyitdev/sddm-astronaut-theme) 和 [sddm-astronaut-theme](https://github.com/Keyitdev/sddm-astronaut-theme)，里面集成许多主题，可以自行选择。
+SDDM 主题可按自己的喜好下载。这里推荐 [SilentSDDM](https://github.com/uiriansan/SilentSDDM) 和 [sddm-astronaut-theme](https://github.com/Keyitdev/sddm-astronaut-theme)，里面集成许多主题，可以自行选择。
 
-主题目录基本都是 `/usr/share/sddm/themes/<theme-name>`。
+sddm 主题的目录基本都是 `/usr/share/sddm/themes/<theme-name>`，同样在这个目录里配置主题。
 
-设置方法见对应主题的说明。
+具体设置方法见对应主题的说明。
 
 #### 设置 SDDM 触摸板轻触为点击
 
@@ -206,6 +209,51 @@ Section "InputClass"
         Option "MiddleEmulation" "on"
         Option "DisableWhileTyping" "on"
 EndSection
+```
+
+### 鼠标光标皮肤
+
+推荐 [Bibata Cursor](https://github.com/ful1e5/Bibata_Cursor)
+
+```bash
+paru -S bibata-cursor-theme-bin
+ls /usr/share/icons/ # 查看皮肤名称
+```
+
+#### SDDM 光标
+
+在 `/etc/sddm.conf` 中添加：
+
+```
+[Theme]
+CursorTheme=Bibata-Modern-Ice
+```
+
+如果不起作用，则可以选择直接修改全局默认光标 `/usr/share/icons/default/index.theme`：
+
+```theme
+[Icon Theme]
+Inherits=Bibata-Modern-Ice
+```
+
+默认为：
+
+```theme
+[Icon Theme]
+Inherits=Adwaita
+```
+
+#### Niri 光标
+
+在 `~/.config/niri/config.kdl` 中添加：
+
+```kdl
+cursor {
+    xcursor-theme "Bibata-Modern-Ice"
+
+    hide-when-typing
+    hide-after-inactive-ms 3000
+}
 ```
 
 ### BUG 处理（小新 Pro 14 2023 EDID 错误）
