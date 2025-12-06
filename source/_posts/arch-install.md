@@ -400,7 +400,7 @@ sudo systemctl enable --now cronie # 启用Timeshift自动备份
 
 ```json
 {
-  "backup_device_uuid" : "21b2199f-38e4-4bf1-ae1e-0c9d4d0431f8",
+  "backup_device_uuid" : "<YOUR_DRIVE_UUID>",
   "parent_device_uuid" : "",
   "do_first_run" : "false",
   "btrfs_mode" : "true",
@@ -430,6 +430,8 @@ sudo systemctl enable --now cronie # 启用Timeshift自动备份
 
 如果安装 Hyprland 之后，如果遇到 timeshift GUI 无法启动的情况，需要安装 `xorg-xhost`。
 原因见 [arch wiki](https://wiki.archlinux.org/title/Timeshift#Timeshift_GUI_not_launching_on_Wayland)
+如果你使用 Niri，那么还需要另外安装一个 [polkit](https://wiki.archlinux.org/title/Polkit) agent，用于图形化身份认证。见<https://yalter.github.io/niri/Important-Software.html#authentication-agent>
+
 {% endnote %}
 
 这里先用命令行启用备份：
