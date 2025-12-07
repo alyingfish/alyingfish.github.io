@@ -533,6 +533,12 @@ gsettings set org.gnome.desktop.default-applications.terminal exec 'ghostty'
 gsettings set org.gnome.desktop.default-applications.terminal exec-arg '-e'
 ```
 
+### 光污染
+
+```bash
+paru -S openrgb
+```
+
 ## 遇到的 Bug 及其处置
 
 ### 小新 Pro 14 2023 EDID 错误
