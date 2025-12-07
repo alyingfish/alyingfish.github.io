@@ -59,7 +59,7 @@ Hyprland 并非开箱即用，需要大量的配置，因此可以先使用大�
 
 #### [HyDE](https://github.com/HyDE-Project/HyDE)
 
-真正的开箱即用，从 GRUB、SDDM 的主题的安装到 Shell、终端、浏览器的设定。甚至对于 NVIDIA 显卡用户，直接把显卡驱动和各种针对 NVIDIA 的各种设置都直接安装并设定好了。当然输入法还是要自己装。
+开箱即用，从 GRUB、SDDM 的主题的安装到 Shell、终端、浏览器的设定。甚至对于 NVIDIA 显卡用户，直接把显卡驱动和各种针对 NVIDIA 的各种设置都直接安装并设定好了。当然输入法还是要自己装。
 
 丰富的主题，内置就有七八种主题，可以一键灵活切换。
 
@@ -85,8 +85,6 @@ sudo pacman -Syu niri
 sudo pacman xdg-desktop-portal-gnome xdg-desktop-portal-gtk gnome-keyring # Portals
 sudo pacman -S xwayland-satellite # Xwayland
 sudo pacman -S polkit-gnome # 身份认证
-# 添加到 `~/.config/niri/config.kdl`
-# spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 ```
 
 以及一些基本的应用：
@@ -94,12 +92,36 @@ sudo pacman -S polkit-gnome # 身份认证
 ```bash
 sudo pacman -S alacritty fuzzel
 sudo pacman -S mako # 一个轻量级通知 daemon
-systemctl --user add-wants niri.service mako.service
+```
+
+添加到 `~/.config/niri/config.kdl`，自动启动：
+
+```kdl
+spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
+spawn-at-startup "mako"
 ```
 
 ## 系统级设置
 
 系统级设置为不在用户主目录下`~/`的配置。
+
+### 设置 `timeshift` 快照
+
+```bash
+sudo pacman -S timeshift
+sudo systemctl enable --now cronie # 启用Timeshift自动备份
+```
+
+{% note info %}
+**Tip**
+
+如果安装 Hyprland 之后，如果遇到 timeshift GUI 无法启动的情况，需要安装 `xorg-xhost`。
+原因见 [arch wiki](https://wiki.archlinux.org/title/Timeshift#Timeshift_GUI_not_launching_on_Wayland)
+如果你使用 Niri，那么还需要另外安装一个 [polkit](https://wiki.archlinux.org/title/Polkit) agent，用于图形化身份认证。见<https://yalter.github.io/niri/Important-Software.html#authentication-agent>
+
+{% endnote %}
+
+使用方法可查阅[简明指南-系统快照（备份）与文件传输](https://arch.icekylin.online/guide/advanced/system-ctl#%E7%B3%BB%E7%BB%9F%E5%BF%AB%E7%85%A7-%E5%A4%87%E4%BB%BD-%E4%B8%8E%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93)。
 
 ### 改键
 
@@ -256,18 +278,12 @@ cursor {
 }
 ```
 
-### BUG 处理（小新 Pro 14 2023 EDID 错误）
+### TODO: 休眠设置
 
-小新 Pro 14 2023 的 EDID 校验码错误，导致显示器帧率无法调至 120 Hz
-
-详细解决方法可参考：<https://github.com/dgroenen/lenovo-ideapad-pro-5-14-14APH8-120hz-fix>
+修改 `/etc/mkinitcpio.conf`，在 `HOOKS()` 内添加 `resume`
 
 ```bash
-# 先下载修复后的 `edid-fixed.bin` 文件
-sudo mkdir /lib/firmware/edid
-sudo mv ~/Downloads/edid-fixed.bin /lib/firmware/edid/edid-fixed.bin
-# 在 grub 里添加内核参数：drm.edid_firmware=eDP-1:edid/edid-fixed.bin
-sudo nvim /etc/default/grub
+sudo mkinitcpio -P # 重新生成 iniramfs
 ```
 
 ## 用户级设置
@@ -382,6 +398,24 @@ paru -S fcitx5-skin-fluentlight-git
 
 之后进入fcitx5-configtool，在 `Addons`-`UI`-`Classic User Interface` 中，在 `Theme` 和 `Dark Theme` 中下拉选中自己想要的主题即可。
 
+### 字体
+
+采用类苹果字体方案：
+
+- 中文字体：苹方字体
+- 英文字体：Inter
+- 等宽字体：Maple Mono NF CN
+- emoji：apple color emoji
+
+详细见 <https://github.com/wxmup/linux-fonts-from-apple?tab=readme-ov-file#readme>
+
+maple 字体 Github releases: <https://github.com/subframe7536/maple-font/releases>
+
+```bash
+sudo pacman -S inter-font ttf-nerd-fonts-symbols-mono 
+paru -S otf-apple-pingfang ttf-apple-emoji ttf-maplemono-cn-unhinted ttf-maplemono-nf-cn-unhinted
+```
+
 ### 动态壁纸
 
 这里使用 [mpvpaper](https://github.com/GhostNaN/mpvpaper)，可以将视频作为桌面，并支持mpv的设置。
@@ -470,7 +504,7 @@ echo 'playlist-next' | socat - /tmp/mpv-socket # 播放下一个
 
 #### 去掉页面周围的间距
 
-地址栏：`about:config`，`zen.theme.content-element-separation` 设置为 0。Hyprland 已有一个间距了。
+地址栏：`about:config`，`zen.theme.content-element-separation` 设置为 0。
 
 #### 滚轮滑动切换标签页
 
@@ -479,3 +513,38 @@ echo 'playlist-next' | socat - /tmp/mpv-socket # 播放下一个
 #### RTX Video Super Resolution
 
 支持与否见 <https://nvidia.custhelp.com/app/answers/detail/a_id/5448/~/rtx-video-faq> 的 COMPATIBILITY & BEHAVIOR
+
+### nautilus 文件管理器
+
+```bash
+paru -S nautilus
+paru -S ffmpegthumbnailer gvfs-smb file-roller gnome-keyring gst-plugins-base gst-plugins-good gst-libav
+```
+
+每个包具体作用见：<https://github.com/SHORiN-KiWATA/ShorinArchExperience-ArchlinuxGuide/wiki/%E5%AE%89%E8%A3%85Niri#nautilus>
+
+### 终端
+
+安装 ghostty 并设置 gnome 默认终端
+
+```bash
+paru -S ghostty
+gsettings set org.gnome.desktop.default-applications.terminal exec 'ghostty'
+gsettings set org.gnome.desktop.default-applications.terminal exec-arg '-e'
+```
+
+## 遇到的 Bug 及其处置
+
+### 小新 Pro 14 2023 EDID 错误
+
+小新 Pro 14 2023 的 EDID 校验码错误，导致显示器帧率无法调至 120 Hz
+
+详细解决方法可参考：<https://github.com/dgroenen/lenovo-ideapad-pro-5-14-14APH8-120hz-fix>
+
+```bash
+# 先下载修复后的 `edid-fixed.bin` 文件
+sudo mkdir /lib/firmware/edid
+sudo mv ~/Downloads/edid-fixed.bin /lib/firmware/edid/edid-fixed.bin
+# 在 grub 里添加内核参数：drm.edid_firmware=eDP-1:edid/edid-fixed.bin
+sudo nvim /etc/default/grub
+```
