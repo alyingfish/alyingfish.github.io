@@ -275,6 +275,7 @@ grub-install --target=x86_64-efi --efi-directory=/boot --removable --recheck
 - 把 loglevel 的数值从 3 改成 5。这样是为了后续如果出现系统错误，方便排错
 - 加入 nowatchdog 参数，这可以显著提高开关机速度
 - 添加/取消这一行的注释：GRUB_DISABLE_OS_PROBER=false，启用 os-prober
+- GRUB_DEFAULT=0 改成 GRUB_DEFAULT=saved，再取消 GRUB_SAVEDEFAULT=true 的注释，启动项记忆功能
 
 ```bash
 nvim /etc/default/grub
@@ -317,6 +318,8 @@ nmcli dev wifi connect <wifi SSID> --ask
 ping www.bilibili.com # 测试网络连接
 ```
 
+也可使用 [nmtui](https://man.archlinux.org/man/nmtui.1) 连接 wifi，有一个简单的终端图形化界面。
+
 #### 准备普通用户
 
 ```bash
@@ -327,7 +330,7 @@ EDITOR=nvim visudo # 启用用户组权限，注释掉这一行：#%wheel ALL=(A
 
 #### 用户设置
 
-更改默认编辑器，在 `/root/.bash_profile` 及 `/home/myusername/.bash_profile` 中加入：
+更改默认编辑器，在 `/root/.bash_profile` 中加入：
 
 ```
 export EDITOR='nvim'
@@ -362,6 +365,14 @@ Server = https://mirrors.hit.edu.cn/archlinuxcn/$arch # 哈尔滨工业大学开
 Server = https://repo.huaweicloud.com/archlinuxcn/$arch # 华为开源镜像站
 ```
 
+#### pacman 设置
+
+仍然是 `/etc/pacman.conf` 配置文件，在 `Misc options` 下面添加：
+
+- Color
+- VerbosePkgLists
+- ILoveCandy
+
 #### 更新`pacman`数据库，安装一些基础功能包
 
 ```bash
@@ -382,67 +393,6 @@ paru -S ttf-ms-win11-auto-zh_cn # 微软字体
 sudo pacman -S bluez bluez-utils
 sudo systemctl enable --now bluetooth # 启用蓝牙服务
 ```
-
-### 设置 `timeshift` 快照
-
-建议在安装驱动前备份。
-
-```bash
-sudo pacman -S timeshift
-sudo systemctl enable --now cronie # 启用Timeshift自动备份
-```
-
-因为还没有安装桌面环境/窗口管理器，需要手动设置 timeshift。
-
-也可以在选择先安装一个临时的桌面环境，设置好 timeshift 备份后，再安装显卡驱动。timeshift 图形界面的设置可参考[简明指南](hitps://arch.icekylin.online/guide/rookie/desktop-env-and-app.html#_12-%E8%AE%BE%E7%BD%AE-timeshift-%E5%BF%AB%E7%85%A7)。
-
-修改 `/etc/timeshift/timeshift.json` 如下，UUID 通过运行 `blkid` 来查看。
-
-```json
-{
-  "backup_device_uuid" : "<YOUR_DRIVE_UUID>",
-  "parent_device_uuid" : "",
-  "do_first_run" : "false",
-  "btrfs_mode" : "true",
-  "include_btrfs_home_for_backup" : "true",
-  "include_btrfs_home_for_restore" : "true",
-  "stop_cron_emails" : "true",
-  "schedule_monthly" : "false",
-  "schedule_weekly" : "false",
-  "schedule_daily" : "true",
-  "schedule_hourly" : "false",
-  "schedule_boot" : "false",
-  "count_monthly" : "2",
-  "count_weekly" : "3",
-  "count_daily" : "5",
-  "count_hourly" : "6",
-  "count_boot" : "5",
-  "snapshot_size" : "0",
-  "snapshot_count" : "0",
-  "date_format" : "%Y-%m-%d %H:%M:%S",
-  "exclude" : [],
-  "exclude-apps" : []
-}
-```
-
-{% note info %}
-**Tip**
-
-如果安装 Hyprland 之后，如果遇到 timeshift GUI 无法启动的情况，需要安装 `xorg-xhost`。
-原因见 [arch wiki](https://wiki.archlinux.org/title/Timeshift#Timeshift_GUI_not_launching_on_Wayland)
-如果你使用 Niri，那么还需要另外安装一个 [polkit](https://wiki.archlinux.org/title/Polkit) agent，用于图形化身份认证。见<https://yalter.github.io/niri/Important-Software.html#authentication-agent>
-
-{% endnote %}
-
-这里先用命令行启用备份：
-
-```bash
-timeshift --list # 查看快照
-timeshift --create --comments "after install" --tags D # 创建快照，标签为每日
-# timeshift  --restore  --snapshot '2014-10-12_16-29-08' --skip-grub # 恢复指定快照，并跳过grub
-```
-
-使用方法可查阅[简明指南-系统快照（备份）与文件传输](https://arch.icekylin.online/guide/advanced/system-ctl#%E7%B3%BB%E7%BB%9F%E5%BF%AB%E7%85%A7-%E5%A4%87%E4%BB%BD-%E4%B8%8E%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93)。
 
 ### 安装显卡驱动
 
@@ -511,4 +461,14 @@ vdpauinfo
 
 sudo pacman -S vulkan-tools # Vulkan Video
 vulkaninfo | grep VK_KHR_video_
+```
+
+### 最后
+
+运行:
+
+```bash
+paru -S fastfetch
+fastfetch
+yes I use arch btw
 ```
