@@ -487,3 +487,28 @@ LIBVA_DRIVER_NAME=nvidia
 ```
 
 {% endnote %}
+
+### 硬件编解码
+
+详细见 [Arch Wiki](https://wiki.archlinux.org/title/Hardware_video_acceleration)
+
+这里假设 Intel 显卡为 Broadwell(2014) 以后的，AMD 使用开源驱动。
+
+```bash
+sudo pacman -S intel-media-driver vulkan-intel # Intel
+sudo pacman -S nvidia-utils nvidia-vaapi-driver # Nvidia
+sudo pacman -S mesa vulkan-radeon # AMD
+```
+
+验证：
+
+```bash
+sudo pacman -S libva-utils # VA-API
+vainfo
+
+sudo pacman -S vdpauinfo # VDPAU
+vdpauinfo
+
+sudo pacman -S vulkan-tools # Vulkan Video
+vulkaninfo | grep VK_KHR_video_
+```

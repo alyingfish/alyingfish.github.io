@@ -327,7 +327,7 @@ fcitx5 -d # 启动fcitx5
 Rime 默认的中文输入是否简陋，这里推荐 [雾凇拼音](https://github.com/iDvel/rime-ice)。
 
 ```bash
-yay -S rime-ice # 安装雾凇拼音输入方案
+paru -S rime-ice # 安装雾凇拼音输入方案
 
 ```
 
@@ -375,9 +375,9 @@ exec-once = fcitx5 --replace -d
 
 ```bash
 # Dark theme
-yay -S fcitx5-skin-fluentdark-git
+paru -S fcitx5-skin-fluentdark-git
 # Light theme
-yay -S fcitx5-skin-fluentlight-git
+paru -S fcitx5-skin-fluentlight-git
 ```
 
 之后进入fcitx5-configtool，在 `Addons`-`UI`-`Classic User Interface` 中，在 `Theme` 和 `Dark Theme` 中下拉选中自己想要的主题即可。
