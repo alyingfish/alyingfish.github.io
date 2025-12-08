@@ -407,7 +407,9 @@ paru -S fcitx5-skin-fluentlight-git
 - 等宽字体：Maple Mono NF CN
 - emoji：apple color emoji
 
-详细见 <https://github.com/wxmup/linux-fonts-from-apple?tab=readme-ov-file#readme>
+`font.config`设置文件见 <https://github.com/wxmup/linux-fonts-from-apple?tab=readme-ov-file#readme>
+
+我注释掉了其中的*渲染设置(字体微调)*，以避免分数缩放时 zen-browser 的部分字体模糊。
 
 maple 字体 Github releases: <https://github.com/subframe7536/maple-font/releases>
 
