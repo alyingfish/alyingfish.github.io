@@ -215,21 +215,21 @@ sddm 主题的目录基本都是 `/usr/share/sddm/themes/<theme-name>`，同样�
 
 #### 设置 SDDM 触摸板轻触为点击
 
-SDDM 默认运行在 Xorg 上，因此要修改 X11 的设置：
+SDDM 默认运行在 Xorg 上，因此要修改 X11 的设置，详细见 [Arch Wiki--libinput](https://wiki.archlinux.org/title/Libinput#Via_Xorg_configuration_file)：
 
-添加文件 `/etc/X11/xorg.conf.d/20-touchpad.conf` 并填入下面的内容：
+添加文件 `/etc/X11/xorg.conf.d/30-touchpad.conf` 并填入下面的内容：
 
 ```conf
 Section "InputClass"
-        Identifier "libinput touchpad catchall"
-        MatchIsTouchpad "on"
-        MatchDevicePath "/dev/input/event*"
-        Driver "libinput"
+    Identifier "Custom Touchpad Settings"
+    MatchIsTouchpad "on"
+    Driver "libinput"
 
-        Option "Tapping" "on"
-        Option "NaturalScrolling" "on"
-        Option "MiddleEmulation" "on"
-        Option "DisableWhileTyping" "on"
+    # BEHAVIOR:
+    Option "Tapping" "on"                # Tap to click
+    Option "NaturalScrolling" "true"     # Invert scroll direction
+    Option "ClickMethod" "clickfinger"   # 2-finger tap = right click, 3-finger tap = midle click
+    Option "DisableWhileTyping" "true"   # Prevent accidents
 EndSection
 ```
 
@@ -518,7 +518,7 @@ echo 'playlist-next' | socat - /tmp/mpv-socket # 播放下一个
 
 ```bash
 paru -S nautilus
-paru -S ffmpegthumbnailer gvfs-smb file-roller gnome-keyring gst-plugins-base gst-plugins-good gst-libav
+sudo pacman -S ffmpegthumbnailer gvfs-smb nautilus-open-any-terminal file-roller gnome-keyring gst-plugins-base gst-plugins-good gst-libav
 ```
 
 每个包具体作用见：<https://github.com/SHORiN-KiWATA/ShorinArchExperience-ArchlinuxGuide/wiki/%E5%AE%89%E8%A3%85Niri#nautilus>
