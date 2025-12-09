@@ -414,7 +414,7 @@ paru -S fcitx5-skin-fluentlight-git
 maple 字体 Github releases: <https://github.com/subframe7536/maple-font/releases>
 
 ```bash
-sudo pacman -S inter-font ttf-nerd-fonts-symbols-mono 
+sudo pacman -S inter-font ttf-nerd-fonts-symbols-mono
 paru -S otf-apple-pingfang ttf-apple-emoji ttf-maplemono-cn-unhinted ttf-maplemono-nf-cn-unhinted
 ```
 
@@ -533,6 +533,59 @@ sudo pacman -S ffmpegthumbnailer gvfs-smb nautilus-open-any-terminal file-roller
 paru -S ghostty
 gsettings set org.gnome.desktop.default-applications.terminal exec 'ghostty'
 gsettings set org.gnome.desktop.default-applications.terminal exec-arg '-e'
+```
+
+### neovim 编辑器
+
+使用 [LazyVim](https://www.lazyvim.org/)：
+
+```bash
+paru -S neovim git lazygit tree-sitter-cli gcc curl fzf ripgrep fd kitty
+git clone https://github.com/LazyVim/starter ~/.config/nvim
+rm -rf ~/.config/nvim/.git
+nvim
+```
+
+安装成功后，在 neovim 的命令行中运行 `LazyHealth` 以检测各插件安装情况。下面是遇到的一些问题和解决方法：
+
+#### pip 和 neovim module 缺失
+
+```bash
+sudo pacman -S python-pip python-pynvim
+```
+
+#### 安装缺失包
+
+```bash
+sudo pacman -S wget luarocks lua51
+```
+
+#### conform.nvim 缺失 Formatter
+
+```vim
+:MasonInstall prettier markdownlint-cli2 markdown-toc
+```
+
+#### vim.provider 的 Node.js 缺失包
+
+```bash
+npm install -g neovim
+```
+
+#### snacks.image
+
+```bash
+sudo pacman -S tectonic mermaid-cli
+```
+
+```vim
+:TSInstall norg svelte
+```
+
+#### grug-far
+
+```bash
+sudo pacman -S ast-grep
 ```
 
 ### 光污染
