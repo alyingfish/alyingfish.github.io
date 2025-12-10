@@ -105,7 +105,21 @@ spawn-at-startup "mako"
 
 系统级设置为不在用户主目录下`~/`的配置。
 
-### 设置 `timeshift` 快照
+### 设置快照
+
+[snapper](https://wiki.archlinux.org/title/Snapper) 和 [timeshift](https://wiki.archlinux.org/title/Timeshift) 二选一，推荐 snapper
+
+#### snapper
+
+```bash
+sudo pacman -S snapper btrfs-assistant
+```
+
+运行 `btrfs-assistant` GUI 以设置 snapper 备份
+
+使用方法可参考：<https://github.com/SHORiN-KiWATA/ShorinArchExperience-ArchlinuxGuide/wiki/%E5%BF%AB%E7%85%A7#snapper>
+
+#### `timeshift`
 
 ```bash
 sudo pacman -S timeshift
@@ -534,6 +548,10 @@ paru -S ghostty
 gsettings set org.gnome.desktop.default-applications.terminal exec 'ghostty'
 gsettings set org.gnome.desktop.default-applications.terminal exec-arg '-e'
 ```
+
+kitty 运行 `kitty +kitten themes` 选择喜欢的主题。
+
+详见: <https://sw.kovidgoyal.net/kitty/kittens/themes/#changing-kitty-colors>
 
 ### neovim 编辑器
 
