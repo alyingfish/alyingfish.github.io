@@ -612,6 +612,10 @@ sudo pacman -S ast-grep
 paru -S openrgb
 ```
 
+### Flatpak
+
+Ref: <https://github.com/SHORiN-KiWATA/ShorinArchExperience-ArchlinuxGuide/wiki/%E8%BD%AF%E4%BB%B6%E5%AE%89%E8%A3%85%E7%9B%B8%E5%85%B3#%E5%A6%82%E4%BD%95%E5%AE%89%E8%A3%85%E8%BD%AF%E4%BB%B6>
+
 ## 遇到的 Bug 及其处置
 
 ### 小新 Pro 14 2023 EDID 错误
