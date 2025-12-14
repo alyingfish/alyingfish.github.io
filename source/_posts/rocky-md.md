@@ -95,7 +95,7 @@ ssh -i ~/.ssh/id_ed25519.pub -p your_ssh_port your_username@your_server_IP # 使
 
 ```bash
 cd /etc/ssh/
-sudo grep -r Port ./
+sudo grep -r PasswordAuthentication ./
 sudo vim /etc/ssh/sshd_config
 ```
 

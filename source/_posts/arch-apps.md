@@ -432,6 +432,12 @@ sudo pacman -S inter-font ttf-nerd-fonts-symbols-mono
 paru -S otf-apple-pingfang ttf-apple-emoji ttf-maplemono-cn-unhinted ttf-maplemono-nf-cn-unhinted
 ```
 
+#### 安装 Windows 字体
+
+Wine 及部分应用需要。
+
+见：<https://arch.icekylin.online/guide/advanced/optional-cfg-1#%E5%AE%89%E8%A3%85-windows-%E5%AD%97%E4%BD%93>
+
 ### 动态壁纸
 
 这里使用 [mpvpaper](https://github.com/GhostNaN/mpvpaper)，可以将视频作为桌面，并支持mpv的设置。
