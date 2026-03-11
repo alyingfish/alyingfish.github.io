@@ -8,21 +8,33 @@ tags:
   - VPS
 ---
 
+### 首次连接服务器
+
+```bash
+ssh root@<<your_server_IP>> -p 22
+```
+
 ### 添加一般用户
 
 ```bash
-adduser your_username
-passwd your_username # 设置密码
-usermod -aG wheel your_username # 添加 sudo 权限
+adduser <your_username>
+passwd <your_username> # 设置密码
+usermod -aG wheel <your_username> # 添加 sudo 权限
 exit
 ```
 
 测试新用户，能否正常使用：
 
 ```bash
-ssh your_username@your_server_IP
+ssh <your_username>@<your_server_IP>
 sudo dnf upgrade
 sudo dnf install vim
+```
+
+### 更改root密码
+
+```bash
+sudo passwd root
 ```
 
 ### ssh 设置
@@ -60,24 +72,25 @@ sudo systemctl restart sshd
 1. 尝试使用默认端口远程登录：
 
 ```bash
-ssh root@your_server_IP
-ssh your_username@your_server_IP
+exit
+ssh root@<your_server_IP>
+ssh <your_username>@<your_server_IP>
 ```
 
-出现 `Connection closed by your_server_IP port 22` 报错则说明 ssh 端口设置成功。
+出现 `Connection closed by <your_server_IP> port 22` 报错则说明 ssh 端口设置成功。
 
-2. 尝试远程登录到 root 用户，使用更改后的端口：
+1. 尝试远程登录到 root 用户，使用更改后的端口：
 
 ```bash
-ssh root@your_server_IP -p your_ssh_port
+ssh root@<your_server_IP> -p <your_ssh_port>
 ```
 
 出现 `Permission denied, please try again.` 报错则说明设置`禁用 root 登录`成功，否则需要确认 `PermitRootLogin` 是否全部修改正确，并且重载了 ssh 服务。
 
-3. 最后远程登录到一般用户，使用更改后的端口：
+1. 最后远程登录到一般用户，使用更改后的端口：
 
 ```bash
-ssh your_username@your_server_IP -p your_ssh_port
+ssh <your_username>@<your_server_IP> -p <your_ssh_port>
 ```
 
 确认登录成功。
@@ -85,10 +98,11 @@ ssh your_username@your_server_IP -p your_ssh_port
 #### ssh 使用密钥登录
 
 ```bash
+exit
 ssh-keygen -t ed25519 -C "your_email@example.com" # 生成密钥
-ssh-copy-id -i ~/.ssh/id_ed25519.pub -p your_ssh_port your_username@your_server_IP # 选择其中一个密钥（如果有多个的话）并添加到VPS
+ssh-copy-id -i ~/.ssh/id_ed25519.pub -p <your_ssh_port> <your_username>@<your_server_IP> # 选择其中一个密钥（如果有多个的话）并添加到VPS
 
-ssh -i ~/.ssh/id_ed25519.pub -p your_ssh_port your_username@your_server_IP # 使用密钥登录 ssh
+ssh -i ~/.ssh/id_ed25519 -p <your_ssh_port> <your_username>@<your_server_IP> # 使用密钥登录 ssh
 ```
 
 最后禁用密码登录：
@@ -108,8 +122,9 @@ sudo systemctl restart sshd
 测试：
 
 ```bash
-ssh your_username@your_server_IP -p your_ssh_port # 失败，提示：Permission denied
-ssh -i ~/.ssh/id_ed25519.pub -p your_ssh_port your_username@your_server_IP # 成功
+exit
+ssh <your_username>@<your_server_IP> -p <your_ssh_port> # 失败，提示：Permission denied
+ssh -i ~/.ssh/id_ed25519.pub -p <your_ssh_port> <your_username>@<your_server_IP> # 成功
 ```
 
 ### 防火墙设置
@@ -126,7 +141,7 @@ sudo firewall-cmd --list-all
 放行 ssh 更改后的端口，禁用原来的端口：
 
 ```bash
-sudo firewall-cmd --permanent --add-port=your_ssh_port/tcp
+sudo firewall-cmd --permanent --add-port=<your_ssh_port>/tcp
 sudo firewall-cmd --permanent --remove-service=ssh
 sudo firewall-cmd --reload
 ```
